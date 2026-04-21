@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package lab;
+
+// --- Module 1 & 4: Admin Service (Reflection enabled & Auth Bypass) ---
+service AdminService {
+  rpc GetSystemLogs (LogRequest) returns (LogResponse);
+  rpc ClearSystemLogs (ClearRequest) returns (ClearResponse);
+}
+
+message LogRequest {
+  string filter = 1;
+}
+
+message LogResponse {
+  repeated string logs = 1;
+}
+
+message ClearRequest {
+  bool force = 1;
+}
+
+message ClearResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// --- Module 3: Data Service (Injection Attacks) ---
+service DataService {
+  rpc GetUserData (UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+  string username = 1;
+}
+
+message UserResponse {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string role = 4;
+}
+
+// --- Module 2: Config Service (IDOR & Interception) ---
+service ConfigService {
+  rpc GetUserConfig (ConfigRequest) returns (ConfigResponse);
+}
+
+message ConfigRequest {
+  string user_id = 1;
+}
+
+message ConfigResponse {
+  string user_id = 1;
+  string theme = 2;
+  string api_key = 3;
+}
+
+// --- Module 5: Streaming Service (Resource Exhaustion/DoS) ---
+service StreamingService {
+  // Notice the 'stream' keyword. The server returns a continuous flood of data.
+  rpc DownloadLargeDataset (DownloadRequest) returns (stream DataChunk);
+}
+
+message DownloadRequest {
+  int32 chunk_count = 1; // Vulnerable: Attacker can request millions of chunks
+}
+
+message DataChunk {
+  string payload = 1;
+}
+
+// --- Module 6: Secure Service (JWT Interceptor Bypass) ---
+service SecureAdminService {
+  rpc TriggerSystemBackup (BackupRequest) returns (BackupResponse);
+}
+
+message BackupRequest {
+  string target_system = 1;
+}
+
+message BackupResponse {
+  string status = 1;
+}
